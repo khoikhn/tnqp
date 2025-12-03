@@ -1,0 +1,1707 @@
+<!doctype html>
+<html lang="vi">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trắc Nghiệm An Toàn Giao Thông</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    :root {
+      --army-green-1: #1a472a;
+      --army-green-2: #2d5016;
+      --army-green-3: #3d6b2e;
+      --medal-gold: #d4af37;
+      --medal-gold-light: #ffd700;
+      --sand: #f5f5dc;
+      --accent-red: #c41e3a;
+      --text-dark: #1a1a1a;
+      --text-light: #e0e0e0;
+      --muted: rgba(255, 255, 255, 0.6);
+      --noise-opacity: 0.03;
+      --camo-opacity: 0.08;
+    }
+
+    body {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Roboto Condensed', 'Inter', 'Arial', sans-serif;
+      min-height: 100%;
+      overflow-x: hidden;
+      position: relative;
+      background: var(--army-green-1);
+    }
+
+    .background-layer-1 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, 
+        var(--army-green-1) 0%, 
+        var(--army-green-2) 25%,
+        var(--army-green-3) 50%,
+        var(--army-green-2) 75%,
+        var(--army-green-1) 100%);
+      background-size: 300% 300%;
+      animation: gradientShift 20s ease infinite;
+      z-index: 1;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .background-layer-2 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/></filter><rect width="300" height="300" filter="url(%23noise)" opacity="0.05"/></svg>');
+      opacity: var(--noise-opacity);
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .background-layer-3 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><defs><pattern id="camo" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse"><ellipse cx="50" cy="40" rx="30" ry="25" fill="%23ffffff" opacity="0.04"/><ellipse cx="120" cy="80" rx="40" ry="30" fill="%23ffffff" opacity="0.04"/><ellipse cx="160" cy="30" rx="25" ry="35" fill="%23ffffff" opacity="0.04"/><path d="M10,100 Q30,80 50,100 T90,100" fill="%23ffffff" opacity="0.03"/><circle cx="180" cy="150" r="20" fill="%23ffffff" opacity="0.04"/></pattern></defs><rect width="400" height="400" fill="url(%23camo)"/></svg>');
+      opacity: var(--camo-opacity);
+      z-index: 3;
+      pointer-events: none;
+      animation: camoFloat 30s ease-in-out infinite;
+    }
+
+    @keyframes camoFloat {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(20px, -20px); }
+    }
+
+    .background-layer-4 {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 40%, 
+        rgba(255, 215, 0, 0.06) 0%, 
+        transparent 50%),
+        radial-gradient(circle at center, 
+        transparent 60%, 
+        rgba(0, 0, 0, 0.4) 100%);
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .parallax-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      pointer-events: none;
+      transition: transform 0.1s ease-out;
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 6;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      background: var(--medal-gold);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: particleFloat 15s linear infinite;
+    }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100px) translateX(100px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .background-layer-1,
+      .background-layer-3,
+      .particle {
+        animation: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .particles {
+        display: none;
+      }
+      .background-layer-3 {
+        opacity: 0.04;
+      }
+    }
+
+    .app-container {
+      position: relative;
+      width: 100%;
+      min-height: 100%;
+      padding: 2rem 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+      width: 100%;
+      max-width: 900px;
+      position: relative;
+    }
+
+    .header-emblem {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+      animation: medalPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes medalPulse {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.05) rotate(2deg); }
+    }
+
+    .title {
+      font-family: 'Oswald', 'Montserrat', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--medal-gold-light);
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7),
+                   0 0 20px rgba(212, 175, 55, 0.3);
+      margin: 0 0 0.5rem 0;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      color: var(--text-light);
+      margin: 0;
+      letter-spacing: 1px;
+    }
+
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 3px solid var(--medal-gold);
+      border-left: 6px solid var(--medal-gold-light);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quiz-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, 
+        var(--medal-gold) 0%, 
+        var(--medal-gold-light) 50%, 
+        var(--medal-gold) 100%);
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .question-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, 
+        rgba(212, 175, 55, 0.1) 0%, 
+        rgba(255, 215, 0, 0.05) 100%);
+      border-radius: 8px;
+      border-left: 4px solid var(--medal-gold);
+    }
+
+    .question-number {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--army-green-1);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .question-number::before {
+      content: '📋 ';
+    }
+
+    .question-text {
+      font-size: 1.35rem;
+      color: var(--text-dark);
+      margin-bottom: 1.8rem;
+      line-height: 1.7;
+      font-weight: 600;
+      padding: 1.2rem;
+      background: linear-gradient(135deg, 
+        rgba(26, 71, 42, 0.05) 0%, 
+        rgba(45, 80, 22, 0.03) 100%);
+      border-radius: 10px;
+      border-left: 4px solid var(--army-green-2);
+    }
+
+    .answers-grid {
+      display: grid;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .answer-button {
+      background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+      border: 2px solid var(--army-green-2);
+      border-radius: 12px;
+      padding: 1.2rem 1.2rem 1.2rem 1rem;
+      text-align: left;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: var(--text-dark);
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .answer-button::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--medal-gold);
+      transform: scaleY(0);
+      transition: transform 0.3s ease;
+    }
+
+    .answer-button:hover:not(.disabled)::before {
+      transform: scaleY(1);
+    }
+
+    .answer-button:hover:not(.disabled) {
+      background: linear-gradient(135deg, var(--sand) 0%, #fafafa 100%);
+      transform: translateX(8px);
+      border-color: var(--medal-gold);
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+    }
+
+    .answer-button.correct {
+      background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+      color: white;
+      border-color: #2e7d32;
+      border-width: 3px;
+      animation: correctPulse 0.6s ease;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.6),
+                  0 4px 16px rgba(76, 175, 80, 0.4);
+    }
+
+    .answer-button.correct::after {
+      content: '✓';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%) scale(0);
+      font-size: 2rem;
+      font-weight: bold;
+      animation: checkMark 0.4s ease 0.2s forwards;
+    }
+
+    @keyframes checkMark {
+      0% { transform: translateY(-50%) scale(0) rotate(-180deg); }
+      100% { transform: translateY(-50%) scale(1) rotate(0deg); }
+    }
+
+    .answer-button.incorrect {
+      background: linear-gradient(135deg, var(--accent-red) 0%, #d32f2f 100%);
+      color: white;
+      border-color: #b71c1c;
+      border-width: 3px;
+      animation: incorrectShake 0.6s ease;
+      box-shadow: 0 0 20px rgba(196, 30, 58, 0.6),
+                  0 4px 16px rgba(196, 30, 58, 0.4);
+    }
+
+    .answer-button.incorrect::after {
+      content: '✗';
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%) scale(0);
+      font-size: 2rem;
+      font-weight: bold;
+      animation: crossMark 0.4s ease 0.2s forwards;
+    }
+
+    @keyframes crossMark {
+      0% { transform: translateY(-50%) scale(0) rotate(180deg); }
+      100% { transform: translateY(-50%) scale(1) rotate(0deg); }
+    }
+
+    .answer-button.disabled {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    @keyframes correctPulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+      50% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); }
+    }
+
+    @keyframes incorrectShake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+      20%, 40%, 60%, 80% { transform: translateX(8px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .answer-button.correct,
+      .answer-button.incorrect {
+        animation: none !important;
+      }
+      .answer-button.correct::after,
+      .answer-button.incorrect::after {
+        animation: none !important;
+        transform: translateY(-50%) scale(1) !important;
+      }
+    }
+
+    .next-button {
+      background: linear-gradient(135deg, var(--medal-gold) 0%, var(--medal-gold-light) 100%);
+      color: var(--army-green-1);
+      border: 3px solid var(--medal-gold);
+      border-radius: 12px;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+    }
+
+    .next-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255, 255, 255, 0.4) 50%, 
+        transparent 100%);
+      transition: left 0.5s ease;
+    }
+
+    .next-button:hover::before {
+      left: 100%;
+    }
+
+    .next-button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.5);
+      border-color: var(--medal-gold-light);
+    }
+
+    .next-button:active:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .next-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .completion-screen {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 4px solid var(--medal-gold);
+      border-radius: 16px;
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .completion-screen::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        var(--medal-gold) 0%, 
+        var(--medal-gold-light) 25%,
+        var(--medal-gold) 50%,
+        var(--medal-gold-light) 75%,
+        var(--medal-gold) 100%);
+      background-size: 300% 300%;
+      animation: borderGlow 3s linear infinite;
+      z-index: -1;
+      border-radius: 16px;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--medal-gold);
+      position: absolute;
+      animation: confettiFall 3s ease-out infinite;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(600px) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    .confetti:nth-child(2n) {
+      background: var(--army-green-2);
+    }
+
+    .confetti:nth-child(3n) {
+      background: var(--medal-gold-light);
+    }
+
+    .completion-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: celebration 1.5s ease-in-out infinite;
+      filter: drop-shadow(0 8px 16px rgba(212, 175, 55, 0.4));
+    }
+
+    @keyframes celebration {
+      0%, 100% { transform: scale(1) rotate(-5deg); }
+      25% { transform: scale(1.1) rotate(5deg); }
+      50% { transform: scale(1.15) rotate(-5deg); }
+      75% { transform: scale(1.1) rotate(5deg); }
+    }
+
+    .completion-title {
+      font-family: 'Oswald', 'Montserrat', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--medal-gold);
+      margin: 0 0 1rem 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3),
+                   0 0 30px rgba(212, 175, 55, 0.5);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+
+    .completion-message {
+      font-size: 1.3rem;
+      color: var(--army-green-1);
+      margin: 0 0 1.5rem 0;
+      line-height: 1.6;
+      font-weight: 500;
+    }
+
+    .final-score {
+      font-size: 4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--medal-gold) 0%, var(--medal-gold-light) 50%, var(--medal-gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 1.5rem 0;
+      text-shadow: 0 4px 8px rgba(212, 175, 55, 0.3);
+      animation: scoreGlow 2s ease-in-out infinite;
+      position: relative;
+    }
+
+    @keyframes scoreGlow {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 10px rgba(212, 175, 55, 0.5)); }
+      50% { filter: brightness(1.2) drop-shadow(0 0 20px rgba(212, 175, 55, 0.8)); }
+    }
+
+    .score-rating {
+      font-size: 1.3rem;
+      color: var(--army-green-2);
+      margin-bottom: 2rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.8rem 1.5rem;
+      background: linear-gradient(135deg, 
+        rgba(212, 175, 55, 0.15) 0%, 
+        rgba(255, 215, 0, 0.1) 100%);
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .restart-button {
+      background: linear-gradient(135deg, var(--army-green-1) 0%, var(--army-green-2) 100%);
+      color: var(--medal-gold-light);
+      border: 3px solid var(--medal-gold);
+      border-radius: 12px;
+      padding: 1rem 3rem;
+      font-size: 1.2rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(26, 71, 42, 0.4);
+    }
+
+    .restart-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 215, 0, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .restart-button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .restart-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(212, 175, 55, 0.5);
+      border-color: var(--medal-gold-light);
+    }
+
+    .restart-button:active {
+      transform: scale(0.98);
+    }
+
+    .sound-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(26, 71, 42, 0.9);
+      backdrop-filter: blur(8px);
+      border: 2px solid var(--medal-gold);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .sound-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(45, 80, 22, 0.95);
+    }
+
+    .sound-toggle.muted {
+      opacity: 0.6;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 1.8rem;
+        letter-spacing: 1.5px;
+      }
+
+      .subtitle {
+        font-size: 1rem;
+      }
+
+      .quiz-container, .completion-screen {
+        padding: 1.5rem;
+      }
+
+      .question-text {
+        font-size: 1.1rem;
+      }
+
+      .answer-button {
+        font-size: 1rem;
+        padding: 1rem;
+      }
+
+      .final-score {
+        font-size: 3rem;
+      }
+
+      .completion-title {
+        font-size: 2rem;
+      }
+
+      .sound-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3rem;
+      }
+
+      .header-emblem {
+        font-size: 3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .app-container {
+        padding: 1rem 0.5rem;
+      }
+
+      .title {
+        font-size: 1.5rem;
+      }
+
+      .quiz-container, .completion-screen {
+        padding: 1rem;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="https://cdn.tailwindcss.com" type="text/javascript"></script>
+ </head>
+ <body>
+  <div class="background-layer-1"></div>
+  <div class="background-layer-2"></div>
+  <div class="background-layer-3"></div>
+  <div class="background-layer-4"></div>
+  <div class="parallax-container"></div>
+  <div class="particles" id="particles"></div>
+  <div class="sound-toggle" id="sound-toggle" title="Bật/Tắt âm thanh">
+   🔊
+  </div>
+  <div class="app-container">
+   <div class="header">
+    <div class="header-emblem">
+     🚦
+    </div>
+    <h1 class="title" id="game-title">TRẮC NGHIỆM AN TOÀN GIAO THÔNG</h1>
+    <p class="subtitle" id="game-subtitle">Kiểm Tra Kiến Thức Pháp Luật Giao Thông</p>
+   </div>
+   <div class="quiz-container" id="quiz-container">
+    <div class="question-text" id="question-text"></div>
+    <div class="answers-grid" id="answers-grid"></div><button class="next-button" id="next-button" disabled>Câu Tiếp Theo</button>
+   </div>
+   <div class="completion-screen hidden" id="completion-screen">
+    <div class="completion-icon">
+     🏆
+    </div>
+    <h2 class="completion-title" id="completion-title">HOÀN THÀNH BÀI KIỂM TRA!</h2>
+    <p class="completion-message" id="completion-message">Xuất sắc! Bạn đã hoàn thành bài kiểm tra.</p>
+    <div class="final-score" id="final-score"></div>
+    <div class="score-rating" id="score-rating"></div><button class="restart-button" id="restart-button">LÀM LẠI</button>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      game_title: "TRẮC NGHIỆM AN TOÀN GIAO THÔNG",
+      game_subtitle: "Kiểm Tra Kiến Thức Pháp Luật Giao Thông",
+      completion_title: "HOÀN THÀNH BÀI KIỂM TRA!",
+      completion_message: "Xuất sắc! Bạn đã hoàn thành bài kiểm tra.",
+      restart_button: "LÀM LẠI"
+    };
+
+    const questions = [
+      {
+        question: "Pháp luật về bảo đảm trật tự, an toàn giao thông được xác định là một bộ phận quan trọng trong hệ thống pháp luật nào của Nhà nước?",
+        answers: [
+          "Pháp luật hình sự",
+          "Pháp luật hành chính nhà nước",
+          "Pháp luật dân sự",
+          "Pháp luật quốc tế"
+        ],
+        correct: 1
+      },
+      {
+        question: "Văn bản pháp luật nào có ý chí cao nhất của Nhà nước, ban hành để chỉ đạo và tổ chức thực hiện bảo đảm trật tự an toàn giao thông?",
+        answers: [
+          "Nghị định của Chính phủ",
+          "Pháp luật do Quốc hội ban hành",
+          "Thông tư của Bộ Giao thông vận tải",
+          "Quyết định của Thủ tướng Chính phủ"
+        ],
+        correct: 1
+      },
+      {
+        question: "Theo tài liệu, 'Văn hóa giao thông' bao gồm các hành vi khi tham gia giao thông nào?",
+        answers: [
+          "Tuân thủ quy tắc giao thông khi có mặt của lực lượng chức năng",
+          "Chấp hành quy tắc giao thông và ứng xử có ý thức tự giác",
+          "Chỉ cần tuân thủ đèn tín hiệu và biển báo giao thông",
+          "Là thước đo trình độ phát triển kinh tế của xã hội"
+        ],
+        correct: 1
+      },
+      {
+        question: "Pháp luật về bảo đảm trật tự an toàn giao thông là cơ sở, công cụ pháp lý quan trọng để thực hiện chức năng nào?",
+        answers: [
+          "Quản lý nhà nước về kinh tế",
+          "Quản lý nhà nước về bảo đảm trật tự an toàn giao thông, trật tự an toàn xã hội",
+          "Quản lý nhà nước về quốc phòng an ninh",
+          "Quản lý nhà nước về giáo dục đào tạo"
+        ],
+        correct: 1
+      },
+      {
+        question: "Tình trạng vi phạm hành chính về trật tự an toàn giao thông và tai nạn giao thông có nguyên nhân từ ý thức chấp hành kém của người tham gia giao thông phổ biến ở dạng nào?",
+        answers: [
+          "Sự xuống cấp của hệ thống giao thông đường bộ",
+          "Việc tổ chức chỉ đạo, phân công, phân cấp giữa các cơ quan chưa hợp lý",
+          "Vi phạm nồng độ cồn, chạy quá tốc độ, lấn làn, vượt ẩu",
+          "Hệ thống văn bản pháp luật chậm được đổi mới"
+        ],
+        correct: 2
+      },
+      {
+        question: "Vi phạm pháp luật về bảo đảm trật tự an toàn giao thông là hành vi có dấu hiệu cơ bản nào?",
+        answers: [
+          "Chỉ cần có hành vi trái pháp luật và xâm hại quan hệ xã hội",
+          "Hành vi xác định của con người, trái pháp luật, có lỗi và có năng lực trách nhiệm pháp lý",
+          "Gây thiệt hại về tài sản và sức khỏe con người",
+          "Đạt đến độ tuổi do pháp luật quy định và có ý thức tự giác"
+        ],
+        correct: 1
+      },
+      {
+        question: "Dấu hiệu nào thể hiện 'Vi phạm pháp luật là hành vi có lỗi của chủ thể'?",
+        answers: [
+          "Hành vi đó xâm hại tới các quan hệ xã hội được pháp luật bảo vệ",
+          "Chủ thể có khả năng nhận thức và điều khiển hành vi của mình",
+          "Hành vi trái pháp luật do chủ thể thực hiện một cách cố ý hoặc vô ý",
+          "Hành vi đó phải được pháp luật xác định rõ ràng"
+        ],
+        correct: 2
+      },
+      {
+        question: "Dấu hiệu 'trái pháp luật' của vi phạm pháp luật thể hiện ở điểm nào?",
+        answers: [
+          "Là hành vi do chủ thể có năng lực trách nhiệm pháp lý thực hiện",
+          "Là hành vi xác định của con người",
+          "Là hành vi xâm hại tới các quan hệ xã hội được pháp luật xác lập và bảo vệ",
+          "Là hành vi có lỗi của chủ thể"
+        ],
+        correct: 2
+      },
+      {
+        question: "Vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông hiện nay có những dạng cơ bản nào?",
+        answers: [
+          "Vi phạm hành chính và Vi phạm dân sự",
+          "Vi phạm kỷ luật và Vi phạm hình sự",
+          "Vi phạm hành chính và Vi phạm hình sự (tội phạm xâm phạm an toàn giao thông)",
+          "Vi phạm về môi trường và Vi phạm về xây dựng"
+        ],
+        correct: 2
+      },
+      {
+        question: "Đặc điểm nào xác định một hành vi vi phạm quy định về TTATGT là 'Vi phạm hành chính'?",
+        answers: [
+          "Là tội phạm và phải bị xử lý hình sự",
+          "Không phải là tội phạm và theo quy định của pháp luật phải bị xử phạt vi phạm hành chính",
+          "Xâm hại đến an toàn giao thông nhưng không có lỗi",
+          "Chỉ do tổ chức thực hiện, không phải do cá nhân"
+        ],
+        correct: 1
+      },
+      {
+        question: "Các tội phạm xâm phạm an toàn giao thông được quy định trong văn bản nào?",
+        answers: [
+          "Luật Giao thông đường bộ năm 2020",
+          "Nghị định số 100/2019/NĐ-CP",
+          "Bộ Luật hình sự 2015 sửa đổi, bổ sung một số điều Bộ luật hình sự 2017",
+          "Tất cả các văn bản trên"
+        ],
+        correct: 2
+      },
+      {
+        question: "Dấu hiệu 'năng lực trách nhiệm pháp lý' của chủ thể vi phạm được thể hiện qua khả năng nào?",
+        answers: [
+          "Chỉ là khả năng điều khiển hành vi của mình",
+          "Khả năng nhận thức và điều khiển hành vi của mình, đồng thời đạt đến độ tuổi do pháp luật quy định",
+          "Khả năng điều khiển hành vi và có lỗi cố ý",
+          "Chỉ là việc đạt đến độ tuổi do pháp luật quy định"
+        ],
+        correct: 1
+      },
+      {
+        question: "Theo tài liệu, đâu là một trong những nguyên nhân chính dẫn đến tình trạng tai nạn giao thông đường bộ từ ý thức chấp hành quy định về luật giao thông của người tham gia giao thông?",
+        answers: [
+          "Sự xuống cấp của hệ thống giao thông đường bộ",
+          "Lượng phương tiện giao thông cơ giới gia tăng quá nhanh",
+          "Uống rượu bia khi tham gia giao thông",
+          "Hành lang an toàn giao thông đường bộ không đảm bảo tiêu chuẩn"
+        ],
+        correct: 2
+      },
+      {
+        question: "Tỷ lệ tai nạn giao thông đường bộ có nguyên nhân từ ý thức chấp hành quy định về luật giao thông của người tham gia giao thông kém là bao nhiêu?",
+        answers: [
+          "Khoảng 50% tổng số vụ xảy ra",
+          "Dưới 30% tổng số vụ xảy ra",
+          "Trên 80% tổng số vụ xảy ra",
+          "Khoảng 60% tổng số vụ xảy ra"
+        ],
+        correct: 2
+      },
+      {
+        question: "Hoạt động giao thông vận tải được cấu thành bởi ba yếu tố cơ bản nào?",
+        answers: [
+          "Quy tắc giao thông, Hệ thống biển báo và Lực lượng cảnh sát giao thông",
+          "Con người, Phương tiện và Kết cấu hạ tầng giao thông vận tải",
+          "Chính phủ, Doanh nghiệp vận tải và Công dân",
+          "Tốc độ, Chất lượng đường và Ý thức lái xe"
+        ],
+        correct: 1
+      },
+      {
+        question: "Nguyên nhân sâu xa của tình trạng mất an toàn giao thông và vi phạm hành chính về trật tự an toàn giao thông hiện nay là gì?",
+        answers: [
+          "Sự không tương thích giữa các yếu tố cơ bản cấu thành hoạt động giao thông vận tải",
+          "Sự thiếu hụt ngân sách đầu tư cho giao thông",
+          "Tình trạng ô nhiễm môi trường và tiếng ồn",
+          "Sự yếu kém về trình độ chuyên môn của cán bộ cảnh sát giao thông"
+        ],
+        correct: 0
+      },
+      {
+        question: "Hạn chế nào sau đây thuộc về công tác quản lý nhà nước về trật tự an toàn giao thông?",
+        answers: [
+          "Người tham gia giao thông uống rượu bia khi lái xe",
+          "Hệ thống văn bản pháp luật chậm được đổi mới, thiếu đồng bộ, thiếu thống nhất",
+          "Tình trạng lạng lách, đánh võng, đua xe trái phép",
+          "Kết cấu hạ tầng giao thông chỉ tập trung cho những công trình quan trọng"
+        ],
+        correct: 1
+      },
+      {
+        question: "Việc phát hiện, xử lý các hành vi vi phạm về giao thông đường bộ chưa đạt được hiệu quả như mong muốn có nguyên nhân từ đâu?",
+        answers: [
+          "Chỉ do thiếu trang thiết bị kỹ thuật hiện đại",
+          "Do sự chống đối của người vi phạm",
+          "Do trình độ, năng lực của một bộ phận cán bộ còn hạn chế, chưa đáp ứng được yêu cầu",
+          "Do thiếu sự phối hợp giữa các lực lượng"
+        ],
+        correct: 2
+      },
+      {
+        question: "Môi trường xã hội tác động tiêu cực đến tình trạng vi phạm hành chính về trật tự an toàn giao thông đường bộ thể hiện qua những biểu hiện nào sau đây?",
+        answers: [
+          "Thói quen tùy tiện, cẩu thả, tự do và thiếu ý thức tuân thủ quy tắc giao thông",
+          "Sự phát triển đồng bộ của các yếu tố con người, phương tiện, kết cấu hạ tầng",
+          "Hệ thống văn bản pháp luật về giao thông đầy đủ, thống nhất",
+          "Tình trạng ùn tắc giao thông và ô nhiễm môi trường"
+        ],
+        correct: 0
+      },
+      {
+        question: "Sự gia tăng quá nhanh của lượng phương tiện giao thông cơ giới đường bộ đã dẫn đến hậu quả gì, nhất là trên địa bàn các thành phố và đô thị lớn?",
+        answers: [
+          "Tình trạng ùn tắc giao thông, ô nhiễm môi trường và tai nạn giao thông đường bộ ở mức cao",
+          "Sự phát triển hài hoà, đồng bộ của các yếu tố cơ bản cấu thành hoạt động giao thông",
+          "Giảm bớt áp lực cho hệ thống giao thông công cộng",
+          "Đẩy mạnh việc nâng cấp, bảo dưỡng công trình giao thông ở vùng xa trung tâm"
+        ],
+        correct: 0
+      },
+      {
+        question: "Ba yếu tố cấu thành hoạt động giao thông vận tải là:",
+        answers: [
+          "Con người — phương tiện — kết cấu hạ tầng",
+          "Nhà nước — doanh nghiệp — người dân",
+          "Tài xế — cảnh sát — tòa án",
+          "Đường bộ — đường sắt — hàng không"
+        ],
+        correct: 0
+      },
+      {
+        question: "Theo bài, nguyên nhân chủ yếu chiếm trên 80% dẫn đến tai nạn và vi phạm là:",
+        answers: [
+          "Hạ tầng giao thông kém",
+          "Thiết bị phương tiện lỗi thời",
+          "Ý thức chấp hành của người tham gia giao thông kém",
+          "Thời tiết xấu"
+        ],
+        correct: 2
+      },
+      {
+        question: "Trong các văn bản sau, văn bản không thuộc bộ công cụ pháp lý điều chỉnh an toàn giao thông nêu trong bài là:",
+        answers: [
+          "Bộ luật Hình sự",
+          "Luật Giao thông đường bộ 2020",
+          "Nghị định 100/2019/NĐ-CP",
+          "Luật Dân sự"
+        ],
+        correct: 3
+      },
+      {
+        question: "Một ví dụ của vi phạm hành chính về trật tự an toàn giao thông là:",
+        answers: [
+          "Điều khiển phương tiện vượt quá tốc độ quy định",
+          "Giết người do lái xe",
+          "Lừa đảo chiếm đoạt tài sản trên đường",
+          "Xuất bản tài liệu trái phép"
+        ],
+        correct: 0
+      },
+      {
+        question: "Tổ chức nào có nhiệm vụ chủ động ban hành luật, nghị quyết và giám sát việc thực thi pháp luật về giao thông?",
+        answers: [
+          "Bộ Tư pháp",
+          "Quốc hội và Hội đồng nhân dân các cấp",
+          "Công ty vận tải",
+          "Hiệp hội người lái xe"
+        ],
+        correct: 1
+      },
+      {
+        question: "Chính phủ và Ủy ban nhân dân các cấp trong phòng chống vi phạm giao thông có nhiệm vụ chính là:",
+        answers: [
+          "Quản lý, điều hành, phối hợp và đảm bảo điều kiện cần thiết",
+          "Chỉ xử phạt hành chính",
+          "Chỉ tuyên truyền mà không thực thi",
+          "Thay tòa án xét xử"
+        ],
+        correct: 0
+      },
+      {
+        question: "Việc lắp đặt hệ thống camera giám sát giao thông được đề xuất nhằm mục đích:",
+        answers: [
+          "Hỗ trợ phát hiện và xử lý vi phạm bằng hình ảnh",
+          "Thay thế hoàn toàn lực lượng Cảnh sát",
+          "Tăng doanh thu từ phạt nguội",
+          "Giảm chi phí xây dựng đường"
+        ],
+        correct: 0
+      },
+      {
+        question: "Trong công tác xử phạt vi phạm hành chính, xử phạt tại chỗ có lợi ích chính là:",
+        answers: [
+          "Tiết kiệm thời gian và giảm phiền hà cho người vi phạm",
+          "Làm mất quyền kháng cáo của người vi phạm",
+          "Tăng mức phạt lên gấp đôi",
+          "Chỉ áp dụng với doanh nghiệp"
+        ],
+        correct: 0
+      },
+      {
+        question: "Một trong những hạn chế của công tác quản lý nhà nước về trật tự an toàn giao thông được nêu là:",
+        answers: [
+          "Thiếu phối hợp giữa các cơ quan, phân công phân cấp chưa hợp lý",
+          "Hệ thống văn bản pháp luật đồng bộ, quá nhanh cập nhật",
+          "Người dân quá tuân thủ luật",
+          "Trang thiết bị luôn hiện đại"
+        ],
+        correct: 0
+      },
+      {
+        question: "Các tổ chức xã hội (đoàn thể, hội) trong phòng chống vi phạm có trách nhiệm:",
+        answers: [
+          "Phối hợp tuyên truyền và huy động hội viên tham gia chương trình phòng chống",
+          "Thay thế quyền hạn của tòa án",
+          "Chỉ làm nhiệm vụ hành chính, không tuyên truyền",
+          "Không liên quan đến công tác phòng chống"
+        ],
+        correct: 0
+      },
+      {
+        question: "Trách nhiệm của nhà trường trong phòng chống vi phạm giao thông KHÔNG bao gồm:",
+        answers: [
+          "Tuyên truyền, giáo dục ý thức cho học sinh, sinh viên",
+          "Phối hợp với Công an cơ sở quản lý sinh viên ngoại trú",
+          "Cung cấp chứng chỉ lái xe miễn phí cho mọi sinh viên",
+          "Tổ chức hoạt động thi tìm hiểu luật"
+        ],
+        correct: 2
+      },
+      {
+        question: "Hình thức biện pháp thuộc nguyên tắc nâng cao hiệu quả xử phạt được đề xuất trong bài là:",
+        answers: [
+          "Kiên quyết loại bỏ thủ tục không cần thiết, rút gọn quy trình",
+          "Tăng cường thủ tục hành chính để phức tạp hóa",
+          "Không cho người vi phạm biết quy trình",
+          "Áp dụng phạt tù cho mọi vi phạm hành chính"
+        ],
+        correct: 0
+      },
+      {
+        question: "Để nâng cao năng lực cho lực lượng Cảnh sát giao thông, bài khuyến nghị:",
+        answers: [
+          "Tăng cường đào tạo, huấn luyện, bồi dưỡng nghiệp vụ",
+          "Giảm thiểu tập huấn để tiết kiệm",
+          "Chỉ tuyển người ngoài ngành",
+          "Giao toàn bộ việc tuần tra cho dân quân tự vệ"
+        ],
+        correct: 0
+      },
+      {
+        question: "Công dân, đặc biệt là sinh viên, được khuyến khích tham gia phòng chống vi phạm giao thông bằng cách:",
+        answers: [
+          "Phát hiện, báo cáo hành vi vi phạm cho cơ quan chức năng",
+          "Tổ chức đua xe trái phép để tăng cảnh giác",
+          "Che giấu chứng cứ vi phạm",
+          "Bỏ qua khi thấy vi phạm"
+        ],
+        correct: 0
+      },
+      {
+        question: "Giải pháp quan trọng nhằm làm cho Luật Giao thông đường bộ 'đi vào đời sống' là:",
+        answers: [
+          "Tăng cường tuyên truyền, giáo dục để hình thành văn hóa giao thông",
+          "Xóa bỏ tất cả biện pháp xử phạt",
+          "Giữ nguyên hiện trạng và không tuyên truyền",
+          "Chỉ phạt bằng hình thức cảnh cáo miệng"
+        ],
+        correct: 0
+      },
+      {
+        question: "Khi phát hiện tiêu cực hoặc hành vi vi phạm của cán bộ CSGT trong quá trình xử lý, người dân nên:",
+        answers: [
+          "Phản ánh qua đường dây nóng, kênh giám sát hoặc báo cáo cấp trên",
+          "Tự ý xử lý cán bộ đó",
+          "Im lặng và đăng hình ảnh bêu riếu lên mạng mà không báo chính quyền",
+          "Thanh toán thêm tiền để được bỏ qua"
+        ],
+        correct: 0
+      },
+      {
+        question: "Theo Nghị định 100/2019/NĐ-CP, mức phạt tiền tối đa đối với cá nhân vi phạm hành chính trong lĩnh vực giao thông đường bộ có thể lên đến:",
+        answers: [
+          "20 triệu đồng",
+          "40 triệu đồng",
+          "75 triệu đồng",
+          "100 triệu đồng"
+        ],
+        correct: 1
+      },
+      {
+        question: "Việc tước quyền sử dụng giấy phép lái xe thuộc hình thức xử phạt nào?",
+        answers: [
+          "Hình phạt chính",
+          "Hình phạt bổ sung",
+          "Biện pháp khắc phục hậu quả",
+          "Hình phạt tù giam"
+        ],
+        correct: 1
+      },
+      {
+        question: "Tổ chức, cá nhân bị xử phạt vi phạm hành chính có quyền khiếu nại trong thời hạn bao lâu kể từ ngày nhận được quyết định xử phạt?",
+        answers: [
+          "05 ngày",
+          "10 ngày",
+          "15 ngày",
+          "30 ngày"
+        ],
+        correct: 1
+      },
+      {
+        question: "Người điều khiển xe mô tô, xe gắn máy vi phạm nồng độ cồn vượt quá 50 miligam/100 mililít máu có thể bị phạt tiền mức nào?",
+        answers: [
+          "Từ 2.000.000đ đến 3.000.000đ",
+          "Từ 4.000.000đ đến 5.000.000đ",
+          "Từ 6.000.000đ đến 8.000.000đ",
+          "Từ 30.000.000đ đến 40.000.000đ"
+        ],
+        correct: 2
+      },
+      {
+        question: "Biện pháp khắc phục hậu quả trong xử phạt vi phạm hành chính về giao thông có thể bao gồm:",
+        answers: [
+          "Buộc nộp lại số lợi bất hợp pháp có được do vi phạm",
+          "Chỉ phạt tiền",
+          "Chỉ tước quyền sử dụng giấy phép",
+          "Không có biện pháp nào"
+        ],
+        correct: 0
+      },
+      {
+        question: "Hành vi điều khiển xe không đội mũ bảo hiểm theo quy định thuộc vi phạm:",
+        answers: [
+          "Vi phạm hình sự",
+          "Vi phạm hành chính",
+          "Vi phạm dân sự",
+          "Không phải vi phạm"
+        ],
+        correct: 1
+      },
+      {
+        question: "Lực lượng nào có thẩm quyền xử phạt vi phạm hành chính trong lĩnh vực giao thông đường bộ?",
+        answers: [
+          "Chỉ có Cảnh sát giao thông",
+          "Cảnh sát giao thông và Thanh tra giao thông",
+          "Chỉ Thanh tra giao thông",
+          "Chỉ Tòa án"
+        ],
+        correct: 1
+      },
+      {
+        question: "Tại sao cần phải có sự phối hợp giữa các cơ quan trong công tác đảm bảo trật tự an toàn giao thông?",
+        answers: [
+          "Để tăng nguồn thu từ phạt nguội",
+          "Vì công tác bảo đảm TTATGT là nhiệm vụ liên ngành, đa lĩnh vực",
+          "Để giảm trách nhiệm của từng cơ quan",
+          "Không cần thiết phải phối hợp"
+        ],
+        correct: 1
+      },
+      {
+        question: "Luật Giao thông đường bộ năm 2008 được thay thế bởi Luật nào?",
+        answers: [
+          "Luật Giao thông đường bộ năm 2019",
+          "Luật Giao thông đường bộ năm 2020",
+          "Luật Giao thông đường bộ năm 2021",
+          "Nghị định 100/2019/NĐ-CP"
+        ],
+        correct: 1
+      },
+      {
+        question: "Theo bài học, văn hóa giao thông cần được hình thành từ:",
+        answers: [
+          "Chỉ từ gia đình",
+          "Từ gia đình, nhà trường và toàn xã hội",
+          "Chỉ từ cơ quan nhà nước",
+          "Chỉ từ truyền thông đại chúng"
+        ],
+        correct: 1
+      },
+      {
+        question: "Mục đích cuối cùng của việc xử phạt vi phạm hành chính về giao thông là:",
+        answers: [
+          "Tăng nguồn thu cho ngân sách nhà nước",
+          "Giáo dục, ngăn ngừa, răn đe vi phạm và bảo đảm trật tự an toàn giao thông",
+          "Trừng phạt nghiêm khắc người vi phạm",
+          "Thu hồi giấy phép lái xe"
+        ],
+        correct: 1
+      },
+      {
+        question: "Đối tượng nào dưới đây có trách nhiệm tham gia đảm bảo trật tự an toàn giao thông?",
+        answers: [
+          "Chỉ có cơ quan nhà nước",
+          "Chỉ có lực lượng Cảnh sát giao thông",
+          "Toàn thể cơ quan, tổ chức, cá nhân",
+          "Chỉ có người điều khiển phương tiện"
+        ],
+        correct: 2
+      },
+      {
+        question: "Sinh viên có thể đóng góp vào công tác đảm bảo trật tự an toàn giao thông bằng cách nào?",
+        answers: [
+          "Tự giác chấp hành pháp luật và tuyên truyền trong cộng đồng",
+          "Chỉ cần không vi phạm là đủ",
+          "Không cần quan tâm vì không phải trách nhiệm của sinh viên",
+          "Chỉ học lý thuyết trong lớp"
+        ],
+        correct: 0
+      },
+      {
+        question: "Ý nghĩa của việc học tập môn Pháp luật về bảo đảm trật tự an toàn giao thông đối với sinh viên là:",
+        answers: [
+          "Chỉ để lấy điểm thi",
+          "Nâng cao nhận thức pháp luật, ý thức trách nhiệm và kỹ năng tham gia giao thông an toàn",
+          "Không có ý nghĩa thực tiễn",
+          "Chỉ áp dụng cho sinh viên ngành giao thông"
+        ],
+        correct: 1
+      },
+      {
+        question: "Theo tài liệu, tình trạng sử dụng các chất kích thích khi điều khiển phương tiện giao thông được xếp vào nhóm nguyên nhân nào gây ra tai nạn giao thông?",
+        answers: [
+          "Sự không tương thích giữa các yếu tố cơ bản cấu thành hoạt động giao thông vận tải",
+          "Môi trường xã hội và tệ nạn xã hội",
+          "Hạn chế trong công tác quản lý nhà nước",
+          "Sự xuống cấp của hệ thống giao thông đường bộ"
+        ],
+        correct: 1
+      },
+      {
+        question: "Hành lang an toàn giao thông đường bộ ở Việt Nam được nhận định là còn nhiều bất cập như thế nào?",
+        answers: [
+          "Đã đảm bảo đúng tiêu chuẩn quy định và có đủ hệ thống hàng rào, biển báo hiệu",
+          "Chưa đảm bảo đúng tiêu chuẩn quy định, thiếu hệ thống hàng rào, biển báo hiệu, gờ giảm tốc",
+          "Đã được chú trọng đầu tư phát triển ở các vùng xa trung tâm",
+          "Là vấn đề đã được khắc phục hoàn toàn trong công tác quản lý nhà nước"
+        ],
+        correct: 1
+      },
+      {
+        question: "Hoạt động phòng ngừa vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông được định nghĩa là hoạt động hướng đến việc gì?",
+        answers: [
+          "Tổ chức lực lượng tuần tra, kiểm soát và xử lý nghiêm các vi phạm",
+          "Triệt tiêu các nguyên nhân, điều kiện của vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông",
+          "Phân công, phân cấp giữa các cơ quan quản lý nhà nước về giao thông đường bộ",
+          "Xây dựng và hoàn thiện hệ thống văn bản pháp luật về đảm bảo trật tự an toàn giao thông"
+        ],
+        correct: 1
+      },
+      {
+        question: "Chủ thể nào sau đây có vai trò ban hành các đạo luật, nghị quyết, các văn bản pháp lý về phòng chống vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        answers: [
+          "Bộ Công an và Bộ Giao thông vận tải",
+          "Chính phủ và Ủy ban nhân dân các cấp",
+          "Quốc hội và Hội đồng nhân dân các cấp",
+          "Các cơ quan bảo vệ pháp luật (Công an, Toà án, Viện kiểm sát)"
+        ],
+        correct: 2
+      },
+      {
+        question: "Quốc hội và Hội đồng nhân dân các cấp tiến hành phòng ngừa vi phạm pháp luật về TTATGT bằng phương diện nào?",
+        answers: [
+          "Sử dụng các cơ quan chuyên trách của Chính phủ tiến hành hoạt động phòng chống tội phạm",
+          "Giám sát chặt chẽ việc tuân thủ pháp luật trong công tác đấu tranh phòng chống vi phạm pháp luật",
+          "Tổ chức thanh tra, kiểm tra, giám sát chặt chẽ và phối hợp điều chỉnh hoạt động phòng chống vi phạm",
+          "Tuyên truyền cho hội viên thấy được những hành vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông"
+        ],
+        correct: 1
+      },
+      {
+        question: "Chức năng chính của Chính phủ và Ủy ban nhân dân các cấp trong phòng chống vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông là gì?",
+        answers: [
+          "Soạn thảo ban hành các văn bản pháp luật có liên quan đến công tác đấu tranh",
+          "Quản lý, điều hành, phối hợp, đảm bảo các điều kiện cần thiết",
+          "Kiểm sát việc tuân theo pháp luật đối với các hoạt động điều tra, xét xử",
+          "Trực tiếp tổ chức, triển khai các hoạt động phòng ngừa vi phạm"
+        ],
+        correct: 1
+      },
+      {
+        question: "Để đảm bảo điều kiện vật chất cho hoạt động phòng chống vi phạm pháp luật về TTATGT, Chính phủ và Ủy ban nhân dân các cấp cần thực hiện nội dung nào?",
+        answers: [
+          "Đảm bảo ngân sách, phương tiện, điều kiện làm việc",
+          "Sử dụng các cơ quan chuyên trách như Công an, Toà án, Viện kiểm sát",
+          "Tổ chức thanh tra, kiểm tra, giám sát chặt chẽ hoạt động phòng chống",
+          "Cụ thể hoá các chỉ thị, nghị quyết của Đảng thành văn bản pháp quy"
+        ],
+        correct: 0
+      },
+      {
+        question: "Đâu là một trong những hoạt động cụ thể hóa của Chính phủ và Ủy ban nhân dân các cấp trong phòng chống vi phạm pháp luật về TTATGT?",
+        answers: [
+          "Cụ thể hoá các chỉ thị, nghị quyết của Đảng thành những văn bản pháp quy hướng dẫn, tổ chức các lực lượng phòng chống",
+          "Ra các Nghị quyết về phòng chống vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông ở địa phương",
+          "Phát hiện những nguyên nhân, điều kiện làm phát sinh hành vi phạm pháp luật thuộc lĩnh vực mình quản lý",
+          "Sử dụng các biện pháp luật định và các biện pháp nghiệp vụ chuyên môn theo chức năng"
+        ],
+        correct: 0
+      },
+      {
+        question: "Lực lượng nào sau đây phải trực tiếp tổ chức, triển khai các hoạt động phòng ngừa vi phạm pháp luật về bảo đảm trật tự, an toàn giao thông?",
+        answers: [
+          "Bộ Tư pháp",
+          "Lực lượng Công an",
+          "Toà án các cấp",
+          "Viện kiểm sát"
+        ],
+        correct: 1
+      },
+      {
+        question: "Nhiệm vụ của Tòa án các cấp trong phòng chống vi phạm pháp luật về TTATGT là gì?",
+        answers: [
+          "Trực tiếp tổ chức, triển khai các hoạt động phòng ngừa vi phạm",
+          "Kiểm sát việc tuân theo pháp luật đối với các hoạt động điều tra, xét xử, thi hành án",
+          "Thông qua hoạt động xét xử các vụ án, phát hiện những nguyên nhân, điều kiện của vi phạm pháp luật để kịp thời ngăn chặn, loại trừ",
+          "Nghiên cứu, phân tích tình trạng phạm tội, xác định chính xác những nguyên nhân, điều kiện"
+        ],
+        correct: 2
+      },
+      {
+        question: "Nhiệm vụ của các cơ quan quản lý kinh tế, văn hoá, giáo dục, dịch vụ, du lịch trong phòng chống vi phạm pháp luật về TTATGT là gì?",
+        answers: [
+          "Trực tiếp xét xử các vụ án về TTATGT",
+          "Phát hiện những nguyên nhân, điều kiện làm phát sinh hành vi phạm pháp luật thuộc lĩnh vực mình quản lý",
+          "Trực tiếp huy động các hội viên tham gia chương trình phòng chống",
+          "Kiểm sát việc tuân theo pháp luật đối với các hoạt động điều tra, xét xử"
+        ],
+        correct: 1
+      },
+      {
+        question: "Các tổ chức xã hội, các tổ chức quần chúng tự quản giữ vị trí như thế nào trong công tác đấu tranh phòng chống vi phạm pháp luật về TTATGT?",
+        answers: [
+          "Không có vai trò gì, vì đây là nhiệm vụ của cơ quan Nhà nước",
+          "Vô cùng quan trọng trong công tác đấu tranh, thông qua các hoạt động hỗ trợ, tuyên truyền và huy động hội viên",
+          "Chỉ có nhiệm vụ soạn thảo, tham gia kế hoạch phòng ngừa",
+          "Chỉ làm nhiệm vụ cảnh giới, báo cáo cho lực lượng chức năng"
+        ],
+        correct: 1
+      },
+      {
+        question: "Giải pháp nào được đề xuất để tăng cường hiệu quả xử phạt vi phạm hành chính, góp phần đảm bảo TTATGT?",
+        answers: [
+          "Thực hiện triệt để hình thức xử phạt tại chỗ và tăng cường lắp đặt hệ thống camera giám sát",
+          "Tuyệt đối không sử dụng hình thức xử phạt tại chỗ để tránh tiêu cực",
+          "Tăng cường đào tạo, huấn luyện nghiệp vụ đấu tranh chống tội phạm cho tất cả mọi công dân",
+          "Chỉ cần ban hành thêm nhiều Nghị định mới về xử phạt vi phạm hành chính"
+        ],
+        correct: 0
+      },
+      {
+        question: "Theo tài liệu, một trong những giải pháp để đổi mới phong cách làm việc của cán bộ, chiến sĩ Cảnh sát giao thông là gì?",
+        answers: [
+          "Kiên quyết đấu tranh, lên án và loại bỏ hành vi tiêu cực của cán bộ",
+          "Giảm bớt quy trình làm việc để tăng tốc độ xử lý",
+          "Chỉ cần tăng cường lắp đặt hệ thống camera giám sát giao thông",
+          "Huy động các tổ chức xã hội tham gia trực tiếp vào quy trình xử phạt"
+        ],
+        correct: 0
+      },
+      {
+        question: "Một trong những tiêu chuẩn quan trọng của người Cảnh sát giao thông có ý nghĩa quyết định để nâng cao hiệu quả công tác là gì?",
+        answers: [
+          "Có bằng lái xe ô tô hạng E",
+          "Có phẩm chất đạo đức tốt, giỏi về chuyên môn nghiệp vụ",
+          "Am hiểu về hệ thống mạng lưới giao thông đường bộ",
+          "Có khả năng giao tiếp lịch sự, niềm nở với nhân dân"
+        ],
+        correct: 1
+      },
+      {
+        question: "Để nâng cao hiệu quả xử lý, cán bộ, chiến sĩ Cảnh sát giao thông cần được tăng cường bồi dưỡng, huấn luyện thêm về nghiệp vụ nào?",
+        answers: [
+          "Nghiệp vụ đấu tranh chống tội phạm và phương pháp thu thập tin tức, tài liệu, vật chứng",
+          "Nghiệp vụ về xử lý vi phạm hành chính đường thủy nội địa",
+          "Kỹ năng lập báo cáo tài chính",
+          "Luật pháp quốc tế về an toàn giao thông"
+        ],
+        correct: 0
+      },
+      {
+        question: "Trách nhiệm của nhà trường trong công tác phòng chống vi phạm pháp luật về TTATGT là gì?",
+        answers: [
+          "Chỉ tổ chức cho sinh viên ngoại trú ký cam kết không vi phạm pháp luật",
+          "Tuyên truyền, giáo dục nâng cao ý thức pháp luật, giáo dục lối sống lành mạnh và đấu tranh chống lối sống tiêu cực",
+          "Được quyền xử phạt hành chính đối với các hành vi vi phạm của sinh viên",
+          "Phối hợp với chính quyền địa phương và gia đình để quản lý học sinh, sinh viên nội trú"
+        ],
+        correct: 1
+      },
+      {
+        question: "Trong công tác phòng chống vi phạm pháp luật về TTATGT, sinh viên được xác định là lực lượng nào?",
+        answers: [
+          "Lực lượng dự bị của Cảnh sát giao thông",
+          "Lực lượng hỗ trợ công tác xét xử của Tòa án",
+          "Lực lượng xung kích",
+          "Lực lượng giám sát hoạt động của các cơ quan Nhà nước"
+        ],
+        correct: 2
+      },
+      {
+        question: "Trách nhiệm của mỗi sinh viên trong việc phòng chống vi phạm pháp luật về TTATGT là gì?",
+        answers: [
+          "Chủ động phát hiện các trường hợp sinh viên trong lớp có những dấu hiệu vi phạm pháp luật",
+          "Chỉ cần cam kết không tham gia vào các hoạt động vi phạm pháp luật",
+          "Trực tiếp tiến hành các hoạt động phòng ngừa vi phạm pháp luật",
+          "Đảm bảo các điều kiện vật chất cho hoạt động phòng chống"
+        ],
+        correct: 0
+      },
+      {
+        question: "Học sinh, sinh viên cần làm gì để thể hiện trách nhiệm của lực lượng xung kích trong phòng chống vi phạm pháp luật về TTATGT?",
+        answers: [
+          "Nhận thức rõ hậu quả, có trách nhiệm phát hiện vi phạm và báo cáo kịp thời cho nhà trường hoặc lực lượng Công an cơ sở",
+          "Chỉ cần tích cực tham gia các tổ tự quản, thanh niên xung kích tuần tra kiểm soát bảo vệ ký túc xá",
+          "Trực tiếp xử lý các trường hợp vi phạm pháp luật của sinh viên trong lớp",
+          "Phối hợp cùng chính quyền địa phương làm trong sạch địa bàn xung quanh Nhà trường"
+        ],
+        correct: 0
+      }
+    ];
+
+    let currentQuestion = 0;
+    let score = 0;
+    let answered = false;
+    let soundEnabled = true;
+
+    function initParticles() {
+      if (window.innerWidth <= 768) return;
+      
+      const particlesContainer = document.getElementById('particles');
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 15 + 's';
+        particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+        particlesContainer.appendChild(particle);
+      }
+    }
+
+    function initParallax() {
+      const parallaxContainer = document.querySelector('.parallax-container');
+      if (!parallaxContainer) return;
+      
+      document.addEventListener('mousemove', (e) => {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        parallaxContainer.style.transform = `translate(${x}px, ${y}px)`;
+      });
+    }
+
+    function initSoundToggle() {
+      const soundToggle = document.getElementById('sound-toggle');
+      soundToggle.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundToggle.textContent = soundEnabled ? '🔊' : '🔇';
+        soundToggle.classList.toggle('muted', !soundEnabled);
+      });
+    }
+
+    function createConfetti() {
+      const completionScreen = document.getElementById('completion-screen');
+      for (let i = 0; i < 50; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + '%';
+        confetti.style.animationDelay = Math.random() * 3 + 's';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        completionScreen.appendChild(confetti);
+      }
+    }
+
+    function updateUI() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      
+      document.getElementById('game-title').textContent = config.game_title || defaultConfig.game_title;
+      document.getElementById('game-subtitle').textContent = config.game_subtitle || defaultConfig.game_subtitle;
+      document.getElementById('completion-title').textContent = config.completion_title || defaultConfig.completion_title;
+      document.getElementById('completion-message').textContent = config.completion_message || defaultConfig.completion_message;
+      document.getElementById('restart-button').textContent = config.restart_button || defaultConfig.restart_button;
+    }
+
+    function playSound(type) {
+      if (!soundEnabled) return;
+      
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        if (type === 'correct') {
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(523.25, audioContext.currentTime);
+          oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime + 0.1);
+          oscillator.frequency.setValueAtTime(783.99, audioContext.currentTime + 0.2);
+          gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.5);
+        } else {
+          oscillator.type = 'triangle';
+          oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(110, audioContext.currentTime + 0.2);
+          gainNode.gain.setValueAtTime(0.4, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+          oscillator.start(audioContext.currentTime);
+          oscillator.stop(audioContext.currentTime + 0.3);
+        }
+      } catch (error) {
+        console.log('Audio not supported');
+      }
+    }
+
+    function displayQuestion() {
+      const question = questions[currentQuestion];
+      
+      document.getElementById('question-text').textContent = question.question;
+      
+      const answersGrid = document.getElementById('answers-grid');
+      answersGrid.innerHTML = '';
+      
+      question.answers.forEach((answer, index) => {
+        const button = document.createElement('button');
+        button.className = 'answer-button';
+        button.textContent = `${String.fromCharCode(65 + index)}. ${answer}`;
+        button.onclick = () => selectAnswer(index);
+        answersGrid.appendChild(button);
+      });
+      
+      document.getElementById('next-button').disabled = true;
+      answered = false;
+    }
+
+    function selectAnswer(selectedIndex) {
+      const question = questions[currentQuestion];
+      const buttons = document.querySelectorAll('.answer-button');
+      
+      if (selectedIndex === question.correct) {
+        if (!answered) {
+          score++;
+          answered = true;
+        }
+        
+        buttons.forEach((button, index) => {
+          button.classList.add('disabled');
+          if (index === question.correct) {
+            button.classList.add('correct');
+          }
+        });
+        
+        playSound('correct');
+        document.getElementById('next-button').disabled = false;
+      } else {
+        const wrongButton = buttons[selectedIndex];
+        wrongButton.classList.add('incorrect');
+        
+        playSound('incorrect');
+        
+        setTimeout(() => {
+          wrongButton.classList.remove('incorrect');
+        }, 800);
+      }
+    }
+
+    function nextQuestion() {
+      currentQuestion++;
+      
+      if (currentQuestion < questions.length) {
+        displayQuestion();
+      } else {
+        showCompletion();
+      }
+    }
+
+    function showCompletion() {
+      document.getElementById('quiz-container').classList.add('hidden');
+      document.getElementById('completion-screen').classList.remove('hidden');
+      document.getElementById('final-score').textContent = `${score}/40`;
+      
+      let rating = '';
+      if (score >= 36) rating = '🎖️ XUẤT SẮC - Kiến thức vững vàng!';
+      else if (score >= 30) rating = '🏅 KHÁ TỐT - Nắm vững kiến thức cơ bản!';
+      else if (score >= 24) rating = '⭐ ĐẠT - Cần ôn luyện thêm!';
+      else rating = '📚 CẦN CỐ GẮNG - Hãy học tập thêm!';
+      
+      document.getElementById('score-rating').textContent = rating;
+      
+      createConfetti();
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      score = 0;
+      
+      const confettis = document.querySelectorAll('.confetti');
+      confettis.forEach(c => c.remove());
+      
+      document.getElementById('completion-screen').classList.add('hidden');
+      document.getElementById('quiz-container').classList.remove('hidden');
+      displayQuestion();
+    }
+
+    document.getElementById('next-button').addEventListener('click', nextQuestion);
+    document.getElementById('restart-button').addEventListener('click', restartQuiz);
+
+    async function onConfigChange(config) {
+      updateUI();
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (config) => ({
+          recolorables: [],
+          borderables: [],
+          fontEditable: undefined,
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (config) => new Map([
+          ["game_title", config.game_title || defaultConfig.game_title],
+          ["game_subtitle", config.game_subtitle || defaultConfig.game_subtitle],
+          ["completion_title", config.completion_title || defaultConfig.completion_title],
+          ["completion_message", config.completion_message || defaultConfig.completion_message],
+          ["restart_button", config.restart_button || defaultConfig.restart_button]
+        ])
+      });
+    }
+
+    initParticles();
+    initParallax();
+    initSoundToggle();
+    displayQuestion();
+    updateUI();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a82d0aa21a7a023',t:'MTc2NDc2MjI5OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
